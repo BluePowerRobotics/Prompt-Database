@@ -1,0 +1,1 @@
+编写opmode测试apriltagprocessor类的功能，实时在telemtry输出apriltag的识别结果，包括每个识别到的tag的id和偏移角度，并提供用手柄方向键调节参数的方法：gamepad1上下键调节Decimation(步长0.1)，左右键调节White Balance（步长100）；gamepad2上下键调节Exposure（步长5），左右键调节Gain（步长5）；所有方向键使用WasPressed()，若调节的同时按住右扳机则步长减半；实时在telemtry上显示当前参数
