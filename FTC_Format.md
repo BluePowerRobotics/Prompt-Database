@@ -95,7 +95,13 @@ FTC比赛中通常同时使用绝对坐标系和相对坐标系。
 
 #### 绝对坐标系
 
-绝对坐标系的定义为：以场地中心为原点，以场地的**右侧为x轴正方向**，以场地的前侧为y轴正方向，以场地的上侧为z轴正方向。
+绝对坐标系的定义如下：
+
+![A square field with X, Y and Z axes shown.](https://ftc-docs.firstinspires.org/en/latest/_images/into-the-deep-field.png "A square field with X, Y and Z axes shown.")
+
+![A diamond field with X, Y and Z axes shown.](https://ftc-docs.firstinspires.org/en/latest/_images/first-res-q-field.png "A diamond field with X, Y and Z axes shown.")
+
+![A square field with X, Y and Z axes shown, with inverted ALLIANCE AREA.](https://ftc-docs.firstinspires.org/en/latest/_images/decode-field.png "A square field with X, Y and Z axes shown, with inverted ALLIANCE AREA.")
 
 绝对坐标系通常用于全场定位，路径规划等。
 
@@ -207,29 +213,43 @@ RobotPosition类用于实时提供小车的本体感觉，如：
 特别地，若一个功能需要每帧调用，则应当提供一个update函数，这个函数不仅需要更新这个功能，还应当调用**一次**该功能直接依赖的每个功能的update函数。最终，在主程序和actions中，应当**每帧调用**直接依赖的所有功能的update函数，从而按依赖关系层层更新。
 
 ## 功能的更新
+
 一场比赛后，往往可以发现当前策略的一些缺陷，此时就应当更新相应功能：
+
 ### 1.确定新策略
+
 比赛结束后，应当立即讨论出action和主程序需要升级的功能和新功能，用todo注释记录。随后逐层分析，自上而下地确定所有需要更新的功能。对于主程序和actions不需要的功能，可以研究有关理论备用，但没有实现的必要。
+
 ### 2.更新理论
+
 对于既有功能的更新，应当尽量延拓现有理论成果；在现有成果不能满足需求时，应当尽量保持现有模型不变，扩充模型，重新推导结论。只有在当前模型不能满足需求时，才考虑重新建模。
 对于新功能，按赛前新功能的开发方法提出新理论即可。
+
 ### 3.更新代码
+
 根据新的理论，应当自下而上更新代码，确保代码与理论一致。实现时，应当尽量保留旧的代码，只增不删。只有当新理论与旧理论有显著差异时，才考虑重构代码。只有当一个功能的所有依赖功能均更新完成，才能开始更新。最后更新主程序和actions。
 
 ### 4.测试代码
+
 更新代码后，应当**同步测试**，在比赛前全部完成所有功能的代码和测试。
 若有问题，则按如下顺序检查:
+
 - 检查新代码实现是否符合新理论要求
 - 若推导了新结论，检查新理论推导过程是否有误
 - 若建立了新模型，检查建立的数学模型是否不够完善
 - 检查当前策略是否过于复杂
 
 修改优先级：**代码>理论结论>理论模型>策略**。
+
 ### 5.功能的回退
+
 若经过反复修改，不能实现新策略，应当及时回退到旧策略，按以下优先级回退：
+
 - 自下而上的修改功能的调用，改为调用旧代码
 - 若旧代码已被删除，从github历史中恢复，直接自下而上地替换文件
 - 若github的历史代码不存在或已经不适配当前程序，应当动用最后手段：从prompt database获取过去的提示词和理论文件，让ai全部重写。
-回退时也应当尽量保留新功能，若之后解决了新功能的bug，可以重新升级。
+  回退时也应当尽量保留新功能，若之后解决了新功能的bug，可以重新升级。
+
 ## 成果的总结
+
 一个赛季结束后，应当总结该赛季推导的所有理论和实现的所有功能，分析其在之后赛季可以复用的地方，补充到prompt database对应文件的末尾。之后的赛季若引用了之前赛季的成果，应当将之前赛季的prompt或docx复制到当前赛季的相同位置，并按当前赛季需要加以补充。
