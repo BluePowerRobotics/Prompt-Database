@@ -158,7 +158,7 @@ double output = controller.calculate(targetPos, currentPos, currentVel, currentA
 
 ## 实现要求
 - 请为目标语言编写三个类（或结构体）：`PIDController`，`SVAController`，`SlotConfig`，`PIDSVAController`。
-- 保持所有逻辑与原描述完全一致，尤其是积分限幅、微分处理、输出限幅和 sign(velocity) 的行为（速度为零时不添加 kS 项）。
+- 保持所有逻辑与原描述完全一致，尤其是积分限幅、微分处理、输出限幅和 sign(velocity) 的行为（速度为零时不添加 kS 项），支持Ziegler-Nichols。
 - 注意处理 dt 可能极小或为零的边界情况（建议 if dt <= 0 则直接返回上次输出或 0，可自由设计简单防护）。
 - 如果目标语言不支持方法重载，请用不同方法名区分（例如 `calculateFull` 和 `calculateSimple`）。
 - 代码应包含必要的注释，解释关键步骤。
