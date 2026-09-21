@@ -1,0 +1,1 @@
+现在要在ftc中使用薄膜压敏电阻和电位器制作电路，实现连接模拟接口的压力传感器,只需检测模拟输入的getVoltage()是否超过某个阈值（压力越大电压越大,范围0-3.3V）；完成 PressureSwitcher.java 包装一个AnalogInput，实时传出一个boolean表示压力是否超过阈值，使用EMA.java对电压滤波，提供接口调节电压阈值和ema的alpha，并提供getRawVoltage和getVoltage接口，程序内所有电压和阈值均归一化(除以3.3V)
