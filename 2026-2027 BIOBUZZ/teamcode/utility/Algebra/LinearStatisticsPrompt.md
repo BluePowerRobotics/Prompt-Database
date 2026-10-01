@@ -1,0 +1,1 @@
+完成LinearStatistics类，实现自动的线性二元数据统计计算，含一个add(x, y)方法添加数据点，sampleCount()方法返回数据点数量, avgX(), avgY(),varX(), varY(), covXY(), corrXY()方法计算均值、方差、协方差、相关系数。weight()，bias()方法计算回归系数，以及calculateR2()方法计算R2值。所有方差均使用总体方差计算。

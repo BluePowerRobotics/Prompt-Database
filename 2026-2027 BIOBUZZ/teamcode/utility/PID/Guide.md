@@ -86,14 +86,11 @@ controller.setSlot(1);
 controller.resetSlot(new SlotConfig().withKP(0.3));          // 更新0号slot
 controller.resetSlot(1, new SlotConfig().withKP(0.25));     // 更新1号slot
 
-// 简单位置闭环
+// 位置闭环（参考速度/加速度由控制器内部按 setpoint 变化率推导）
 double output = controller.calculate(setpoint, measurement, dt, false);
 
-// 简单速度闭环（setpoint作为前馈速度项）
+// 速度闭环（setpoint 即参考速度）
 double output = controller.calculate(setpoint, measurement, dt, true);
-
-// 完整PIDSVA闭环
-double output = controller.calculate(setpoint, measurement, velocity, acceleration, dt);
 
 // 重置状态
 controller.reset();
@@ -116,6 +113,25 @@ SlotConfig config = new SlotConfig()
     .withOutputLimits(-1.0, 1.0); // 输出限幅
 ```
 
+### 5. 输出分量读取
+
+`PIDSVAController` 在每次 `calculate` 后会记录各分量贡献，可通过 getter 实时读取，用于遥测显示与整定诊断：
+
+```java
+// 读取最近一次总输出（限幅后）
+double output = controller.getLastOutput();
+
+// 读取各分量贡献（限幅前的原始值）
+double pTerm = controller.getLastPTerm();  // kP * error
+double iTerm = controller.getLastITerm();  // kI * integral
+double dTerm = controller.getLastDTerm();  // kD * derivative
+double sTerm = controller.getLastSTerm();  // kS * sign(参考速度)
+double vTerm = controller.getLastVTerm();  // kV * 参考速度
+double aTerm = controller.getLastATerm();  // kA * 参考加速度
+```
+
+整定时将各分量加入 FTC Dashboard plot，可直观判断哪一项主导输出、积分是否饱和、前馈是否充足。
+
 ---
 
 ## 典型用法示例
@@ -133,8 +149,7 @@ PIDSVAController motorController = new PIDSVAController().withSlot0(
 // 在循环中
 double targetPos = 1000; // 目标编码器位置
 double currentPos = motor.getCurrentPosition();
-double currentVel = motor.getVelocity(); // 需自行计算
-double output = motorController.calculate(targetPos, currentPos, currentVel, 0, dt);
+double output = motorController.calculate(targetPos, currentPos, dt, false);
 motor.setPower(output);
 ```
 
@@ -159,7 +174,9 @@ motor.setPower(output);
 
 ## 注意事项
 
-1. `SlotConfig` 的默认输出限幅为 `-14.0 ~ 14.0`，请根据实际驱动能力用 `withOutputLimits` 调整
+1. `SlotConfig` 的默认输出限幅为 `-1.0 ~ 1.0`（对应 `setPower` 的功率范围）；如需电压控制（`setVoltage`），可用 `withOutputLimits(-14.0, 14.0)` 调整
 2. `resetSlot` 会用新构建的 `SlotConfig` 整体替换原配置；未被 `withXxx` 覆盖的字段会回到默认值，更新个别参数时请先构建包含完整参数的 `SlotConfig`
-3. 切换 slot 会重置积分与微分状态
+3. 切换 slot 会重置积分、微分状态与 setpoint 历史
 4. `PIDController` 没有 4 参数构造函数，需同时指定 `maxI` 和 `iZone` 时使用 5 参数版本
+5. `PIDSVAController.calculate` 只接收 `setpoint` 与 `measurement`：SVA 前馈的参考速度/加速度由控制器内部按 `setpoint` 的变化率推导（速度闭环时 `setpoint` 即参考速度），因此**不要再传入实测速度**，否则会与微分项相互抵消
+6. 调用 `calculate` 前必须已配置当前 slot（至少 `withSlot0(...)`），否则抛出 `IllegalArgumentException("Slot not configured")`
